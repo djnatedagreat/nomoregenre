@@ -9,10 +9,16 @@ def get_duration(file):
     return duration
 
 # should really be format_seconds
-def convert_seconds(seconds):
+def format_seconds(seconds):
     hours, remainder = divmod(seconds, 3600)  # Get hours
     minutes, seconds = divmod(remainder, 60)  # Get minutes and seconds
-    return f"{hours}:{minutes}:{seconds}"
+    result = ""
+    if hours > 0:
+        result = result + f"{round(hours)} Hrs "
+    if minutes > 0:
+        result = result + f"{round(minutes)} Mins "
+    result = result + f"{round(seconds)} Secs"
+    return result
 
 # converts hh::mm::ss.sss to seconds
 def get_seconds(time_str):

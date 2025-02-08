@@ -37,10 +37,20 @@ class AudioClip(BaseModel):
     @property
     def duration(self):
         return self.end_time - self.start_time
-    def get_length_str(self): # human readable
+    def format_seconds(self):
         hours, remainder = divmod(self.duration, 3600)  # Get hours
         minutes, seconds = divmod(remainder, 60)  # Get minutes and seconds
-        return f"{hours}:{minutes}:{seconds}"
+        result = ""
+        if hours > 0:
+            result = result + f"{round(hours)} Hrs "
+        if minutes > 0:
+            result = result + f"{round(minutes)} Mins "
+        result = result + f"{round(seconds)} Secs"
+        return result
+    #def get_length_str(self): # human readable
+     #   hours, remainder = divmod(self.duration, 3600)  # Get hours
+      #  minutes, seconds = divmod(remainder, 60)  # Get minutes and seconds
+       # return f"{hours}:{minutes}:{seconds}"
 
 class Show(BaseModel):
     build_date = DateField()

@@ -4,8 +4,9 @@ import ffmpeg
 import inquirer
 import argparse
 from datetime import date, datetime
+from utils import format_seconds
 from models import AudioClip, AudioAsset, Creator, Show, ShowFormat, ShowSegment
-from audio_functions import get_duration, format_seconds
+from audio_functions import get_duration
 from dotenv import dotenv_values
 from colorama import Fore, Back, Style
 
@@ -74,7 +75,6 @@ def print_show_overview():
     
 
 print_show_overview()
-
 
 while show_format.has_unfilled_part():
     part_to_fill = show_format.get_first_unfilled_part()

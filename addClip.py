@@ -6,7 +6,7 @@ from models import AudioAsset, Creator, AssetType, AudioClip
 from dotenv import dotenv_values
 from slugify import slugify
 import os
-from audio_functions import get_seconds
+from utils import get_seconds
 
 config = dotenv_values(".env")  # take environment variables from .env.
 

@@ -2,7 +2,7 @@ import argparse
 import inquirer
 import datetime
 import ffmpeg
-from models import AudioAsset, Creator, AssetType, AudioClip
+from models import AudioAsset, Creator, AssetType, AudioClip, format_seconds
 from dotenv import dotenv_values
 from slugify import slugify
 import os
@@ -34,26 +34,12 @@ questions = [
 ]
 
 answers = inquirer.prompt(questions)
-#print(answers.segments)
-
-# Get clip length
-def format_seconds(seconds):
-    hours, remainder = divmod(seconds, 3600)  # Get hours
-    minutes, seconds = divmod(remainder, 60)  # Get minutes and seconds
-    return hours, minutes, seconds
 
 probe = ffmpeg.probe(args.file)
-duration = float(probe['format']['duration'])  # Extract duration
-h, m, s = format_seconds(duration)
-print(f"{h} hours, {m} minutes, {s} seconds")
-print(f"Duration: {duration:.2f}");
+duration = float(probe['format']['duration'])  # Extract duration in seconds
+readable_duration= format_seconds(duration)
+print(f"Duration: {readable_duration}")
 
-#class AudioAsset(BaseModel):
-    #name = CharField()
-    #filename = CharField()
-    #type = ForeignKeyField(AssetType, backref='assets')
-    #creator = ForeignKeyField(Creator, backref='assets')
-    #submitted = DateField()
 mix = AudioAsset(key=slugify(answers["name"]), name=answers["name"], filename=os.path.basename(args.file), type=mixtype.id, creator=answers["creator"], submitted=answers["submit_date"])
 mix.save() # now stored in the database
 

@@ -91,10 +91,47 @@ class ShowFormat(Model):
             return True
         else:
             return False
-    def get_first_unfilled_part(self):
+    
+    def get_unfilled_parts(self):
+        unfilled = []
         for p in self.parts:
             if p.incomplete():
-                return p
+                #print("inc " + p.name)
+                unfilled.append(p)
+        return unfilled
+
+    def get_first_unfilled_part(self):
+        unfilled_parts = self.get_unfilled_parts()
+        if len(unfilled_parts) > 0:
+            return unfilled_parts[0]
+        else:
+            return False
+    
+    # let's change this to reduce_unfilled_parts_by(secs) and
+    # do the calculation of time outside of this function.
+    # overage could be applied multiple times. See below.
+    def reduce_unfilled(self, secs):
+        if self.min_duration == 0 and self.max_duration == 0:
+            return
+        if not self.has_unfilled_part:
+            return
+        unfilled = self.get_unfilled_parts()
+        unfilled_count = len(unfilled)
+        if unfilled_count == 0:
+            return
+        
+        # shorten unfilled parts
+        time_for_each = secs // unfilled_count
+        print ("time for each: " + format_seconds(time_for_each))
+        for p in unfilled:
+            print("before min: " + p.name + " " +format_seconds(p.duration_min))
+            print("before max: " + p.name + " " +format_seconds(p.duration_max))
+            p.duration_min = p.duration_min - time_for_each
+            p.duration_max = p.duration_max - time_for_each
+            print("after min: " + format_seconds(p.duration_min))
+            print("after max: " + format_seconds(p.duration_max))
+        return
+               
     def build(self, output_file):
         streams = []
         for p in self.parts:
@@ -129,12 +166,19 @@ class ShowFormatPart(Model):
         for c in self.clips:
             duration = duration + c.duration
         return duration
-
-    def incomplete(self):
-        if self.clip_total_duration < self.duration_min:
+    @property
+    def overage(self):
+        overage = self.clip_total_duration - self.duration_min
+        return max(0,overage)
+    @property
+    def filled(self):
+        if self.get_min_time_to_fill() <= 0:
             return True
         else:
             return False
+        
+    def incomplete(self):
+        return not self.filled
 
     def get_min_time_to_fill(self):
         return self.duration_min - self.clip_total_duration
@@ -144,8 +188,6 @@ class ShowFormatPart(Model):
     
     def add_clip(self, clip: AudioClip):
         self.clips.append(clip)
-        #self.clip_total_duration = self.clip_total_duration + duration
-
     
 class ShowSegment(BaseModel):
     show = ForeignKeyField(Show)

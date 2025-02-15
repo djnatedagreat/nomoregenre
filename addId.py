@@ -5,6 +5,7 @@ import ffmpeg
 from models import AudioAsset, Creator, AssetType, AudioClip
 from slugify import slugify
 from dotenv import dotenv_values
+from utils import format_seconds
 import os
 
 config = dotenv_values(".env")  # take environment variables from .env.
@@ -44,10 +45,8 @@ def format_seconds(seconds):
 
 probe = ffmpeg.probe(args.file)
 duration = float(probe['format']['duration'])  # Extract duration
-h, m, s = format_seconds(duration)
-print(f"{h} hours, {m} minutes, {s} seconds")
-print(f"Duration: {duration:.2f}");
-
+readable_duration= format_seconds(duration)
+print(f"Duration: {readable_duration}")
 
 id = AudioAsset(key=slugify(answers["name"]),name=answers["name"], filename=os.path.basename(args.file), type=mixtype.id, creator=answers["creator"], submitted=answers["submit_date"])
 id.save() # now stored in the database
@@ -57,5 +56,3 @@ clip = AudioClip(asset=id.id,start_time=0,end_time=duration)
 clip.save()
 
 #print(mix.__dict__)
-
-

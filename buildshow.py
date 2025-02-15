@@ -83,12 +83,14 @@ while show_format.has_unfilled_part():
         print("  " + c.asset.name)
     
     print("  " + format_seconds(part_to_fill.get_min_time_to_fill()) + " left to fill")
-    #print("Need between: " +  )
     print("\n")
+
     clip = choose_segment(part_to_fill.get_min_time_to_fill(), part_to_fill.get_max_time_to_fill())
-    #curr_clip = ffmpeg.input(clip.asset.filename)
     part_to_fill.add_clip(clip)
-    #print(clip)
+
+    # should only do this after a part is filled, and if there's an overage.
+    if part_to_fill.filled and part_to_fill.overage > 0:
+        show_format.reduce_unfilled(part_to_fill.overage)
 
 print_show_overview()
 questions = [

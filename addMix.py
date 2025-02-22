@@ -7,6 +7,9 @@ from dotenv import dotenv_values
 from slugify import slugify
 import os
 
+print("DEPRECATED: INSTEAD USE audio_asset.py")
+exit()
+
 config = dotenv_values(".env")  # take environment variables from .env.
 
 # Create ArgumentParser

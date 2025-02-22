@@ -8,10 +8,13 @@ from dotenv import dotenv_values
 from utils import format_seconds
 import os
 
+print("DEPRECATED: INSTEAD USE audio_asset.py")
+exit()
+
 config = dotenv_values(".env")  # take environment variables from .env.
 
 # Create ArgumentParser
-parser = argparse.ArgumentParser(description="Register am ID in the database")
+parser = argparse.ArgumentParser(description="DEPRECATED: INSTEAD USE audio_asset.py")
 
 # Add an argument
 parser.add_argument("file", help="File location of ID")

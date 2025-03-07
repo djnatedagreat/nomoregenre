@@ -1,0 +1,49 @@
+{
+    "name" : "No More Genre Default Format",
+    "duration_min" : 10800,
+    "duration_max" : 10980,
+    "segments" : [
+        {
+            "name": "Legal ID 1",
+            "key": "legal-1",
+            "clips": [
+                {"id": 1}
+            ]
+        },
+        {
+            "name": "Hour 1",
+            "key": "hour-1",
+            "clips": [],
+            "duration_min" : 3574,
+            "duration_max" : 3807
+        },
+        {
+            "name": "Legal ID 2",
+            "key": "legal-2",
+            "clips": [
+                {"id": 1}
+            ]
+        },
+        {
+            "name": "Hour 2",
+            "key": "hour-2",
+            "clips": [],
+            "duration_min" : 3574,
+            "duration_max" : 3807
+        },
+        {
+            "name": "Legal ID 3",
+            "key": "legal-3",
+            "clips": [
+                {"id": 1}
+            ]
+        },
+        {
+            "name": "Hour 3",
+            "key": "hour-3",
+            "clips": [],
+            "duration_min" : 3574,
+            "duration_max" : 3807
+        }
+    ]
+}

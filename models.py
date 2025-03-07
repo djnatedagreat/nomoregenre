@@ -53,14 +53,11 @@ class AudioClip(BaseModel):
 class Show(BaseModel):
     build_date = DateField()
     first_air_date = DateField()
-    #filename = CharField(null=True, column_name=None)
+    duration = IntegerField()
+    filename = CharField(null=True)
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._clips = []
-        self._filename = None
-    @property
-    def filename(self):
-        return self._filename
     @property
     def clips(self):
         return self._clips 
@@ -70,7 +67,135 @@ class Show(BaseModel):
         for c in clips:
             tot_duration = tot_duration + c.duration
         return tot_duration
+    
+    def has_unfilled_segment(self):
+        if self.get_first_unfilled_segment():
+            return True
+        else:
+            return False
+
+    def get_unfilled_segments(self):
+        unfilled = []
+        for seg in self.segments:
+            if seg.incomplete():
+                #print("inc " + p.name)
+                unfilled.append(seg)
+        return unfilled
+    
+    def get_first_unfilled_segment(self):
+        unfilled_segs = self.get_unfilled_segments()
+        if len(unfilled_segs) > 0:
+            return unfilled_segs[0]
+        else:
+            return False
         
+    def build(self, directory):
+        # TODO: Should not assume that directory ends with /
+        outputfile = directory + self.filename
+        streams = []
+        for seg in self.segments:
+            for sc in seg.clips:
+                # TODO: Should not know about LIBRARY DIR. Should probably call a util
+                streams.append(ffmpeg.input(config["LIBRARY_DIR"] + "/" + sc.clip.asset.type.name + "/" + sc.clip.asset.filename, ss=sc.clip.start_time, to=sc.clip.end_time))
+        (
+        ffmpeg
+        .concat(*streams, v=0, a=1)
+        .output(outputfile)
+        .run()
+        ) 
+
+    # do the calculation of time outside of this function.
+    # overage could be applied multiple times. See below.
+    def reduce_unfilled_segments(self, secs):
+        if self.duration == 0:
+            return
+        if not self.has_unfilled_segment:
+            return
+        unfilled = self.get_unfilled_segments()
+        unfilled_count = len(unfilled)
+        if unfilled_count == 0:
+            return
+
+        # shorten unfilled parts
+        time_for_each = secs // unfilled_count
+        print ("time for each: " + format_seconds(time_for_each))
+        for seg in unfilled:
+            print("before min: " + seg.name + " " +format_seconds(seg.duration_min))
+            print("before max: " + seg.name + " " +format_seconds(seg.duration_max))
+            seg.duration_min = seg.duration_min - time_for_each
+            seg.duration_max = seg.duration_max - time_for_each
+            seg.save()
+            print("after min: " + format_seconds(seg.duration_min))
+            print("after max: " + format_seconds(seg.duration_max))
+        return
+
+class ShowSegment(BaseModel):
+    show = ForeignKeyField(Show, backref="segments")
+    name = CharField()
+    duration_min = IntegerField(default=0)
+    duration_max = IntegerField(default=0)
+    #segment = ForeignKeyField(AudioClip) # this will be moving to ShowSegmentClips
+    @property
+    def filled_time(self):
+        duration = 0
+        for sc in self.clips:
+            duration = duration + sc.clip.duration
+        return duration
+    @property
+    def total_filled_time(self):
+        duration = 0
+        for c in self.clips:
+            duration = duration + c.duration
+        return duration
+    @property
+    def overage(self):
+        overage = self.total_filled_time - self.duration_min
+        return max(0,overage)
+    @property
+    def is_filled(self):
+        if self.get_min_time_to_fill() <= 0:
+            return True
+        else:
+            return False
+
+    def incomplete(self):
+        return not self.is_filled
+
+    def get_min_time_to_fill(self):
+        return self.duration_min - self.total_filled_time
+        return self.duration_min - self.total_filled_time
+    @property
+    def is_filled(self):
+        if self.get_min_time_to_fill() <= 0:
+            return True
+        else:
+            return False
+
+    def incomplete(self):
+        return not self.is_filled
+
+    def get_min_time_to_fill(self):
+        return self.duration_min - self.total_filled_time
+
+    def get_max_time_to_fill(self):
+        return self.duration_max - self.total_filled_time
+
+    def add_clip(self, clip: AudioClip):
+        ShowSegmentClip.create(clip=clip, segment=self)
+        #clips = list(self.clips)
+        #clips.append(ShowSegmentClip(clip=clip))
+
+class ShowSegmentClip(BaseModel):
+    segment = ForeignKeyField(ShowSegment, backref="clips")
+    clip = ForeignKeyField(AudioClip, backref='segments')
+    @property
+    def duration(self):
+        return self.clip.duration
+
+
+
+'''
+
 class ShowFormat(Model):
     min_duration = float
     max_duration = float
@@ -193,3 +318,4 @@ class ShowSegment(BaseModel):
     show = ForeignKeyField(Show)
     segment = ForeignKeyField(AudioClip)
 
+'''

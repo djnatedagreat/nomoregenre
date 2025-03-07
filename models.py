@@ -2,10 +2,10 @@ from dotenv import dotenv_values
 from peewee import * 
 from playhouse.sqlite_ext import SqliteExtDatabase
 from audio_functions import get_duration
-from utils import format_seconds
+from utils import format_seconds, load_config
 import ffmpeg
 
-config = dotenv_values(".env")  # take environment variables from .env.
+config = load_config()  # take environment variables from .env.
 
 db = SqliteExtDatabase(config["SQLITE_DB"])
 

@@ -14,3 +14,12 @@ def format_seconds(seconds):
         result = result + f"{round(minutes)} Mins "
     result = result + f"{round(seconds)} Secs"
     return result
+def load_config():
+    from os import path
+    from dotenv import dotenv_values
+    if path.exists(".env.local"):
+        print("LOCAL DEV ENVIRONMENT ACTIVATED")
+        return dotenv_values(".env.local")
+    else:
+        return dotenv_values(".env")  # take environment variables from .env.
+    

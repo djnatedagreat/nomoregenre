@@ -1,3 +1,5 @@
+from colorama import Fore, Back, Style
+
 # converts hh::mm::ss.sss to seconds
 def get_seconds(time_str):
     """Get seconds from time."""
@@ -14,6 +16,7 @@ def format_seconds(seconds):
         result = result + f"{round(minutes)} Mins "
     result = result + f"{round(seconds)} Secs"
     return result
+
 def load_config():
     from os import path
     from dotenv import dotenv_values
@@ -23,3 +26,10 @@ def load_config():
     else:
         return dotenv_values(".env")  # take environment variables from .env.
     
+# Display
+# TODO implement **kwargs
+def h1(str):
+    print("\n"+Fore.MAGENTA + Style.BRIGHT + str + Style.RESET_ALL)
+
+def h2(str):
+    print("\n  "+Fore.CYAN + Style.BRIGHT + str + Style.RESET_ALL)

@@ -9,6 +9,7 @@ from models import AudioClip, AudioAsset, Creator, Show, ShowFormat, ShowSegment
 from audio_functions import get_duration
 from dotenv import dotenv_values
 from colorama import Fore, Back, Style
+from os import remove, path
 
 config = dotenv_values(".env")  # take environment variables from .env.
 
@@ -22,9 +23,26 @@ parser.add_argument("showdate", help="First air date of the show")
 args = parser.parse_args()
 
 #print (args.showdate)
+show_filename = config["LIBRARY_DIR"]+"/show/no-more-genre-{}.mp3".format(args.showdate)
+
+# Check if show already exists and handle as follows
+existing_show = Show.get_or_none(first_air_date=args.showdate);
+if existing_show:
+    questions = [
+        inquirer.Confirm("confirm_continue", message="A show for that date already exists. Do you want to overwrite it and start fresh?"),
+    ]
+    answers = inquirer.prompt(questions)
+    if answers["confirm_continue"]:
+        print(str(existing_show.id))
+        existing_show.delete_instance(recursive=True)
+        if path.exists(show_filename):
+            remove(show_filename)
+    else:
+        print("Bye!")
+        exit()
 
 show, show_created = Show.get_or_create(first_air_date=args.showdate, defaults={"build_date": date.today()})
-show._filename = config["LIBRARY_DIR"]+"/show/no-more-genre-{}.mp3".format(args.showdate)
+show._filename = show_filename
 
 #legal_id_file = config["ID_DIR"]+"/legal-id.mp3"
 legal_id_clip = (AudioClip.select().join(AudioAsset).where(AudioAsset.key == "legal-id").get())

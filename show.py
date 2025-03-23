@@ -15,7 +15,7 @@ config = load_config()
 parser = argparse.ArgumentParser(description="Manage Shows")
 
 # Add an argument
-parser.add_argument("command", help="add, list, rm, show, fill, build")
+parser.add_argument("command", help="add, list, rm, show, fill, clear, build")
 parser.add_argument("--program", dest="program", help="Show Program Definition File (JSON)", required=False)
 parser.add_argument("--id", dest="id", help="Specify a show ID for the current action", required=False)
 parser.add_argument("--name", dest="name", help="Specify a name for the current action", required=False)
@@ -223,7 +223,23 @@ match args.command:
         directory = config["LIBRARY_DIR"]+"/show/"
         show.build(directory)
         print("Build Complete!")
-
+    case "clear":
+        id = require_id()
+        show = Show.get_by_id(id)
+        for seg in show.segments:
+            prompt = [
+                inquirer.Confirm("delete_seg", message="Delete Segment " + seg.name + "?")
+            ]
+            answer = inquirer.prompt(prompt)
+            if answer["delete_seg"]:
+                print("Deleting Segment " + seg.name)
+                for c in seg.clips:
+                    c.delete_instance()
+            else:
+                print("Leaving Segment " + seg.name)
+        #    
+        #print("All Segments have been cleared")
+        #Need to rethink this... because I don't want to clear pre-programmed segments
     case "rm" | "remove" | "delete" | "del":
         id = require_id()
         show = Show.get_by_id(id)

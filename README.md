@@ -161,8 +161,9 @@ Next...
 $ python show.py [show date]
 ```
 
-## Road Map
+## Road Map / TO DO
 
+* Add Description fields to Audio Assets
 * options for fading between clips.
 * smarter ways of choosing clips
 

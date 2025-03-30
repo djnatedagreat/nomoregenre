@@ -5,11 +5,15 @@ import ffmpeg
 from slugify import slugify
 from models import Creator, AudioAsset, AssetType, AudioClip
 from peewee import fn
+from utils import get_seconds, load_config
+
+config = load_config()
 
 parser = argparse.ArgumentParser(description="Manage audio assets such as mixes and IDs")
 
 # Add an argument
-parser.add_argument("command", help="add, list, rm")
+parser.add_argument("command", help="add, list, rm, preview")
+parser.add_argument("--id", dest="id", help="Asset ID", required=False)
 parser.add_argument("--name", dest="name", help="Asset Name", required=False)
 parser.add_argument("--type", dest="type", help="Asset Type", required=False)
 parser.add_argument("--creator", dest="creator", help="Asset Creator", required=False)
@@ -28,6 +32,16 @@ type_options = []
 for at in AssetType.select():
   type_options.append((at.name, at.id))
 
+def require_id():
+    if args.id:
+        return args.id
+    else:
+        prompt = [
+            inquirer.Text("id", message="Enter an ID")
+        ]
+        answer = inquirer.prompt(prompt)
+        return answer["id"]
+    
 def require_name():
     if args.name:
         return args.name
@@ -90,7 +104,7 @@ match args.command:
             creator = Creator.get(fn.LOWER(Creator.name) == fn.LOWER(args.creator))
             assets = assets.where(AudioAsset.creator == creator.id)
         for a in assets:
-            print (a.type.name + "\t" + a.creator.name + "\t" + a.name)
+            print ("("+str(a.id)+") "+a.type.name + "\t" + a.creator.name + "\t" + a.name)
     case "add":
         asset_name = require_name()
         key=slugify(asset_name)
@@ -142,32 +156,33 @@ match args.command:
         #    exit()
         #creator.delete_instance()
         print("Not Implemented ") #+creator.name+ " has been deleted.")
+    case "preview":
+        from pydub import AudioSegment
+        from pydub.playback import play
+        import numpy as np
+        clip_len = 7 * 1000
+        cf = 1*1000
+        id = require_id()
+        aa = AudioAsset.get_by_id(id)
+        directory = config["LIBRARY_DIR"]+"/"+aa.type.name+"/"
+        asset_file = directory + aa.filename
+        segment = AudioSegment.from_file(asset_file, format="mp3")
+        # get evenly spaced clips
+        segment.duration_seconds
+        markers = np.linspace(0, segment.duration_seconds, 5)[1:-1]
+        print(markers)
+        preview = AudioSegment.empty()
+        preview += segment[:clip_len]
+        for m in markers:
+            #print('appending preview at' +str(m))
+            st = m*1000
+            end = st + clip_len
+            #print("len: " + str(end - st))
+            preview = preview.append(segment[st:end], crossfade=cf)
+        preview = preview.append(segment[0-clip_len:], crossfade=cf)
+        # could build a preview file and save it with something like .preview.mp3
+        # and look for it first. Maybe that would save some time.
+        play(preview)
     case _:
         parser.print_help()
-
-
-
-#import datetime
-#
-#from models import AudioAsset, Creator, AssetType, AudioClip, format_seconds
-#from dotenv import dotenv_values
-
-#config = dotenv_values(".env")  # take environment variables from .env.
-
-
-
-# Use the argument
-#questions = [
- #   inquirer.Text("name", message="Enter a descriptive name for the mix."),
-  #  inquirer.List("creator", message="Please choose the DJ/Creator", choices=creator_options),
-   # inquirer.Text("submit_date", message="Enter the date this mix was submitted",default=datetime.date.today()),
-#]
-
-#answers = inquirer.prompt(questions)
-
-
-#readable_duration= format_seconds(duration)
-#print(f"Duration: {readable_duration}")
-
-#
-
+        

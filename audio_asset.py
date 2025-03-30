@@ -185,4 +185,3 @@ match args.command:
         play(preview)
     case _:
         parser.print_help()
-        

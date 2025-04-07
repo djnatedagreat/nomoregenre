@@ -22,13 +22,13 @@ The No More Genre radio show airs weekly on Sanctuary Radio (https://www.mediasa
 
 The No More Genre Show features DJ mixes composed by the No More Genre DJs:
 
-*BAX
-*DJ Nate Da Great
-*Poetik Selektions
-*Jonesy
-*DJ Ayo
-*Intel Hayesfield
-*and guests
+* BAX
+* DJ Nate Da Great
+* Poetik Selektions
+* Jonesy
+* DJ Ayo
+* Intel Hayesfield
+* and guests
 
 After months of using Ableton to edit together our weekly 3-hour radio shows, I (DJ Nate Da Great) decided to automate the process and save some time.
 
@@ -50,7 +50,7 @@ A classification for types of audio assets. This could be a mix or a song or a s
 
 ### Audio Clips
 
-An audio clip is a segment of an audio asset as defined in seconds. All clips have a start and end time that are defined in seconds from the beginning of the clip. Most audio assets will have a clip representing the entire duration of the asset. But, it's also possible to create a clip that is only part of an audio asset. For example, You might have a DJ mix that is 60 Minutes long, but you can also specifify a secondary clip of that mix that is just 30 Minutes long.
+An audio clip is a segment of an audio asset as defined in seconds. All clips have a start and end time that are defined in seconds from the beginning of the clip. All audio assets will have a clip representing the entire duration of the asset. But, it's also possible to create a clip that is only part of an audio asset. For example, You might have a DJ mix that is 60 Minutes long, but you can also specifify a secondary clip of that mix that is just 30 Minutes long.
 
 ### Program
 
@@ -77,39 +77,39 @@ Next...
 8. define a show format / program in a .json file (See... nomoregenre_program.json)
 9. start creating some shows
 
-## Usage
+## CLI Usage
 
 ### Manage Creators
 
 #### Add Creator
 
-`$ python creator.py add`
+`$ python nmg.py c add creator_name`
 
 #### Remove Creator
 
-`$ python creator.py rm`
+`$ python nmg.py c rm creator_name`
 
 #### Rename Creator
 
-`$ python creator.py rename`
+`$ python nmg.py c rename old_name new_name`
 
 #### List All Creators
 
-`$ python creator.py list`
+`$ python nmg.py c list`
 
 ### Manage Asset Types
 
 #### Add Asset Type
 
-`$ python asset_type.py add`
+`$ python nmg.py at add asset_type_name`
 
 #### Remove Asset Type
 
-`$ python asset_type.py rm`
+`$ python nmg.py at rm asset_type_name`
 
 #### List Asset Types
 
-`$ python asset_type.py list`
+`$ python nmg.py at list`
 
 ### Manage Audio Assets
 

@@ -111,23 +111,41 @@ Next...
 
 `$ python nmg.py at list`
 
+
 ### Manage Audio Assets
 
 #### Add Audio Asset
 
-`$ python audio_asset.py add`
+`$ python a add --file path_to_audio_file.mp3 --name="Unique Asset name" --by="creator_name" --when=2025-04-11`
 
-#### List AUdio Assets
+Note that the argument "a" can be substituted for any asset type, eg. mix, id, song, etc... and the asset type will be set appropriately
 
-`$ python audio_asset.py list`
+`$ python song add --file path_to_audio_file.mp3 --name="Unique Asset name" --by="creator_name" --when=2025-04-11`
+
+#### List Audio Assets
+
+`$ python nmg.py a list [--by="creator_name"]`
+
+Replace a with an asset type, eg. mix, etc... and only that asset type will be listed
+
+`$ python nmg.py mix list [--by="creator_name"]`
+
+#### Preview Audio Asset
+
+`$ python nmg.py a preview --id="x"`
+
+Replacing "a" with asset type is allowed, but it doesn't change the behavior
+
+`$ python nmg.py mix preview --id="x"`
+
 
 ### Manage Audio Clips
 
-#### Add Audio Asset
+#### Add Audio Clip
 
 `$ python audio_clip.py add`
 
-#### List Audio Assets
+#### List Audio Clip
 
 `$ python audio_clip.py list`
 

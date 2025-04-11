@@ -1,7 +1,7 @@
 import argparse
 import importlib
 
-def handle(args):
+def handle(args, **kwargs):
     #print(args)
     parser = argparse.ArgumentParser(prog="nmg.py asset_type", description="Asset Type actions")
     action_parsers = parser.add_subparsers(dest="action", help="Available Actions: add, list, rm")

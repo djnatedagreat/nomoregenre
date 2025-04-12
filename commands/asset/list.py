@@ -1,6 +1,7 @@
 import argparse
-from models import AudioAsset, AssetType, Creator
-from peewee import fn
+from models import AudioAsset, AssetType, Creator, AudioClip, ShowSegmentClip
+from peewee import fn, JOIN
+from tabulate import tabulate
 
 class ListAssetAction:
 
@@ -9,7 +10,16 @@ class ListAssetAction:
         self.creator_name = creator_name
         
     def run(self):
-        assets = AudioAsset.select()
+        assets = (AudioAsset.select(
+                    AudioAsset,
+                    fn.COUNT(ShowSegmentClip.id).alias('clip_use_count')
+                 )
+                 .join(Creator)
+                 .join(AudioClip, JOIN.LEFT_OUTER, on=(AudioAsset.id == AudioClip.asset_id))
+                 .join(ShowSegmentClip, JOIN.LEFT_OUTER, on=(AudioClip.id == ShowSegmentClip.clip_id))
+                 .group_by(AudioAsset.id)
+                 .order_by(Creator.name)
+                 )
         if (self.asset_type):
             type = AssetType.get_or_none(AssetType.name == self.asset_type)
             assets = assets.where(AudioAsset.type == type.id)
@@ -18,8 +28,14 @@ class ListAssetAction:
             if not creator:
                 raise Exception("Invalid creator specified.")
             assets = assets.where(AudioAsset.creator == creator.id)
+        
+        headers = ['ID','Type', 'Created By', 'Asset Name', 'Use Count']
+        data = []
         for a in assets:
-            print(f"({a.id}) {a.type.name}\t{a.creator.name}\t{a.name}")
+            data.append([a.id, a.type.name, a.creator.name, a.name, a.clip_use_count])
+            #print(f"({a.id}) {a.type.name}\t\t{a.creator.name}\t{a.name}\t\t{a.clip_use_count}")
+        
+        print(tabulate(data, headers=headers, tablefmt="pipe"))
             #print ("("+str(a.id)+") "+a.type.name + "\t" + a.creator.name + "\t" + a.name)
 
 # kwargs "at" for asset_type filter eg. mix, id, etc. assumes asset type name 

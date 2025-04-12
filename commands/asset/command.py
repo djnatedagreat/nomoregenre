@@ -13,6 +13,7 @@ def handle(cli_args, **kwargs):
     action_parsers.add_parser("list", help="List Assets")
     action_parsers.add_parser("rm", help="Remove Asset")
     action_parsers.add_parser("preview", help="Preview Asset")
+    action_parsers.add_parser("show", help="Show Asset Details")
     args, remaining_args = parser.parse_known_args(cli_args)
     try:
         module_name = f"commands.asset.{args.action}"

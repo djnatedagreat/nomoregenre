@@ -125,26 +125,9 @@ def choose_clip(segment):
 
 match args.command:
     case "list":
-        shows = Show.select()
-        for s in shows:
-            print ("(" +Fore.WHITE+Style.BRIGHT+ str(s.id) + Style.RESET_ALL+ ")\t" + s.first_air_date.strftime("%Y-%m-%d"))
+        print('use: python nmg.py show list')
     case "show":
-        id = require_id()
-        show = Show.get_by_id(id)
-        if (show):
-            h1 ("Show Details")
-            print(Fore.CYAN+"ID:\t\t"+Fore.WHITE+Style.BRIGHT + str(show.id) + Style.RESET_ALL)
-            print(Fore.CYAN+"First Air Date:\t" +Fore.WHITE+Style.BRIGHT + show.first_air_date.strftime("%Y-%m-%d")+ Style.RESET_ALL)
-            print(Fore.CYAN+"Duration:\t" +Fore.WHITE+Style.BRIGHT + str(show.duration) + " secs" + Style.RESET_ALL)
-            if show.filename:
-                print(Fore.CYAN+"Filename:\t" +Fore.WHITE+Style.BRIGHT + show.filename+ Style.RESET_ALL)
-            if show.build_date:
-                print(Fore.CYAN+"Build Date:\t" +Fore.WHITE+Style.BRIGHT + show.build_date.strftime("%Y-%m-%d")+ Style.RESET_ALL)
-            else:
-                print(Fore.CYAN+"Build Date:\t" +Fore.WHITE+Style.BRIGHT + "Not Built"+ Style.RESET_ALL)
-            print_show_program(show)
-        else:
-            print("Not Found")
+        print('use: python nmg.py show show --id=x')
     case "add":
         show_date = require_airdate()
         #existing_show = Show.get_or_none(first_air_date=show_date)
@@ -192,6 +175,8 @@ match args.command:
                 error_saving = True
 
     case "fill":  
+        print('use: python nmg.py show fill --id=x')
+        exit()
         id = require_id()
         show = Show.get_by_id(id)
         while show.has_unfilled_segment():

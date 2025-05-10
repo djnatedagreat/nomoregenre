@@ -134,6 +134,8 @@ class ShowSegment(BaseModel):
     name = CharField()
     duration_min = IntegerField(default=0)
     duration_max = IntegerField(default=0)
+    # prefill only segments can only be filled during program creation
+    prefill_only = BooleanField(default=False)  
     #segment = ForeignKeyField(AudioClip) # this will be moving to ShowSegmentClips
     @property
     def filled_time(self):

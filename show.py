@@ -125,89 +125,20 @@ def choose_clip(segment):
 
 match args.command:
     case "list":
-        print('use: python nmg.py show list')
+        print('deprecated. Use: python nmg.py show list')
+       
     case "show":
-        print('use: python nmg.py show show --id=x')
-    case "add":
-        show_date = require_airdate()
-        #existing_show = Show.get_or_none(first_air_date=show_date)
-        #if existing_show:
-        ##    print("A show for that date already exists.")
-        #    exit()
-
-        # Build Program from definition file
-        program_def = require_program_def()
-        #print(program_def["duration_min"])
-        
-        # TODO: Remove Hardcoding from the following lines
-        show_name = "No More Genre Show: {}".format(show_date)
-        #build_date=datetime.now().strftime("Y-%m-%d")
-        duration = program_def["duration_min"]
-        db = SqliteDatabase(':memory:')
-        with db.atomic() as transaction:  # Opens new transaction.
-            try:
-                show = Show(name=show_name,first_air_date=show_date, duration=duration)
-                show.save()
-                for seg in program_def["segments"]:
-                    print(seg)
-                    segment = ShowSegment(name=seg["name"],show=show)
-                    
-                    if "duration_min" in seg:
-                        segment.duration_min = seg["duration_min"]
-                    if "duration_max" in seg:
-                        segment.duration_max = seg["duration_max"]
-                    
-                    segment.save()
-                    print(segment)
-                    if seg["clips"] and len(seg["clips"]) > 0:
-                        # add clips
-                        for sc in seg["clips"]:
-                            clip = AudioClip.get_by_id(sc["id"])
-                            new_segment_clip = ShowSegmentClip(segment=segment, clip=clip)
-                            new_segment_clip.save()
-                            print()
-            except BaseException as e:
-                # Because this block of code is wrapped with "atomic", a
-                # new transaction will begin automatically after the call
-                # to rollback().
-                transaction.rollback()
-                print(f"An error occurred: {e}")
-                error_saving = True
-
-    case "fill":  
-        print('use: python nmg.py show fill --id=x')
+        print('deprecated. Use: python nmg.py show show --id=x')
         exit()
-        id = require_id()
-        show = Show.get_by_id(id)
-        while show.has_unfilled_segment():
-            segment_to_fill = show.get_first_unfilled_segment()
-            print(Fore.CYAN + Style.BRIGHT + "Filling " +segment_to_fill.name + Style.RESET_ALL ) 
-            for sc in segment_to_fill.clips:
-                print("  " + sc.clip.asset.name)
-
-            print("  " + format_seconds(segment_to_fill.get_min_time_to_fill()) + " left to fill")
-            print("\n")
-            new_clip = choose_clip(segment_to_fill)
-            segment_to_fill.add_clip(new_clip)
-
-            if segment_to_fill.is_filled and segment_to_fill.overage > 0:
-                show.reduce_unfilled_segments(segment_to_fill.overage)
-
-            # I'm WORKING HERE
-        print('Show is filled! Use build command to make mp3 file.')  
+    case "add":
+        print('deprecated. Use: python nmg.py show add')
+        exit()
+    case "fill":  
+        print('deprecated. Use: python nmg.py show fill --id=x')
+        exit()
     case "build":
-        id = require_id()
-        show = Show.get_by_id(id)
-        print('Let\'s Build!')
-        #print (args.showdate)
-        # TODO: Remove Hardocding
-        show_filename = config["LIBRARY_DIR"]+"/show/no-more-genre-{}.mp3".format(show.first_air_date)
-        show.filename = "no-more-genre-{}.mp3".format(show.first_air_date)
-        show.build_date = date.today()
-        show.save()
-        directory = config["LIBRARY_DIR"]+"/show/"
-        show.build(directory)
-        print("Build Complete!")
+        print('deprecated. Use: python nmg.py show build --id=x')
+        exit()
     case "clear":
         print('deprecated. Use: python nmg.py show clear --id=x')
         exit()

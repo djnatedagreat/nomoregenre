@@ -18,7 +18,7 @@ class ListAssetAction:
                  .join(AudioClip, JOIN.LEFT_OUTER, on=(AudioAsset.id == AudioClip.asset_id))
                  .join(ShowSegmentClip, JOIN.LEFT_OUTER, on=(AudioClip.id == ShowSegmentClip.clip_id))
                  .group_by(AudioAsset.id)
-                 .order_by(Creator.name)
+                 .order_by(Creator.name, AudioAsset.submitted)
                  )
         if (self.asset_type):
             type = AssetType.get_or_none(AssetType.name == self.asset_type)
@@ -29,10 +29,10 @@ class ListAssetAction:
                 raise Exception("Invalid creator specified.")
             assets = assets.where(AudioAsset.creator == creator.id)
         
-        headers = ['ID','Type', 'Created By', 'Asset Name', 'Use Count']
+        headers = ['ID','Key', 'Type', 'Created By', 'Asset Name', 'Submitted', 'Use Count']
         data = []
         for a in assets:
-            data.append([a.id, a.type.name, a.creator.name, a.name, a.clip_use_count])
+            data.append([a.id, a.key, a.type.name, a.creator.name, a.name, a.submitted, a.clip_use_count])
             #print(f"({a.id}) {a.type.name}\t\t{a.creator.name}\t{a.name}\t\t{a.clip_use_count}")
         
         print(tabulate(data, headers=headers, tablefmt="pipe"))

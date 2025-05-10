@@ -75,6 +75,7 @@ class AudioClip(BaseModel):
         return audio
     
 class Show(BaseModel):
+    name = CharField()
     build_date = DateField()
     first_air_date = DateField()
     duration = IntegerField()

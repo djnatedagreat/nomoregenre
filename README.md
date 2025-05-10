@@ -138,12 +138,21 @@ Replacing "a" with asset type is allowed, but it doesn't change the behavior
 
 `$ python nmg.py mix preview --id="x"`
 
+#### View/Show Audio Asset
+
+`$ python nmg.py a show --id="x"`
+
+Replacing "a" with asset type is allowed, but it doesn't change the behavior
+
+`$ python nmg.py mix show --id="x"`
 
 ### Manage Audio Clips
 
 #### Add Audio Clip
 
-`$ python audio_clip.py add`
+`$ python nmg.py mix clip --id="x" start end`
+
+--id is the id of the Audio Asset being clipped
 
 #### List Audio Clip
 

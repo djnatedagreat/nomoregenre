@@ -19,6 +19,7 @@ def main():
         "c": "creator",
         "dj": "creator",
         "show": "show",
+        "s": "show"
     }
     at_kwarg_map = {
         "asset": {"at":None},
@@ -29,6 +30,7 @@ def main():
         "c": {"at":None},
         "dj": {"at":None},
         "show": {"at":None},
+        "s": {"at":None},
     }
     # dynamic asset commands based on asset_types
     at_aliases = ['a']

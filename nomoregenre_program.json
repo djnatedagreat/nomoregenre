@@ -6,6 +6,7 @@
         {
             "name": "Legal ID 1",
             "key": "legal-1",
+            "prefill_only": true,
             "clips": [
                 {"id": 1}
             ]
@@ -13,6 +14,7 @@
         {
             "name": "Hour 1",
             "key": "hour-1",
+            "prefill_only": false,
             "clips": [],
             "duration_min" : 3574,
             "duration_max" : 3807
@@ -20,6 +22,7 @@
         {
             "name": "Legal ID 2",
             "key": "legal-2",
+            "prefill_only": true,
             "clips": [
                 {"id": 1}
             ]
@@ -27,6 +30,7 @@
         {
             "name": "Hour 2",
             "key": "hour-2",
+            "prefill_only": false,
             "clips": [],
             "duration_min" : 3574,
             "duration_max" : 3807
@@ -34,6 +38,7 @@
         {
             "name": "Legal ID 3",
             "key": "legal-3",
+            "prefill_only": true,
             "clips": [
                 {"id": 1}
             ]
@@ -41,6 +46,7 @@
         {
             "name": "Hour 3",
             "key": "hour-3",
+            "prefill_only": false,
             "clips": [],
             "duration_min" : 3574,
             "duration_max" : 3807

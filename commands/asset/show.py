@@ -5,6 +5,7 @@ from ..action import Action
 from os import path
 from utils import get_seconds, load_config, h1, h2
 from colorama import Fore, Back, Style
+from tabulate import tabulate
 
 config = load_config()
 
@@ -57,8 +58,12 @@ class ShowAssetAction(Action):
             print(Fore.CYAN+"Filename:\t" +Fore.WHITE+Style.BRIGHT + aa.filename+ Style.RESET_ALL)
         
         h1 ("Clips")
+        clip_headers = ['ID','Length', 'Start', 'End', 'Fade In', 'Fade Out']
+        clip_data = []
         for c in aa.clips:
-            print(Fore.CYAN+"("+str(c.id)+")\t\t"+Fore.WHITE+Style.BRIGHT +  c.format_seconds()  + "\t\tfrom " + str(c.start_time) +  Style.RESET_ALL)
+            clip_data.append([c.id, c.format_seconds(), str(c.start_time), str(c.end_time),str(c.fade_in_length),str(c.fade_out_length)])
+            #print(Fore.CYAN+"("+str(c.id)+")\t\t"+Fore.WHITE+Style.BRIGHT +  c.format_seconds()  + "\t\tfrom " + str(c.start_time) +  Style.RESET_ALL)
+        print(tabulate(clip_data, headers=clip_headers, tablefmt="pipe"))
         # Add to display: Included in shows, Clips
         h1 ("Appears in Shows")
         for s in shows:

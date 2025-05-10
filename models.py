@@ -2,6 +2,7 @@ from dotenv import dotenv_values
 from peewee import * 
 from playhouse.sqlite_ext import SqliteExtDatabase
 from audio_functions import get_duration
+from os import path
 from utils import format_seconds, load_config
 import ffmpeg
 
@@ -49,7 +50,30 @@ class AudioClip(BaseModel):
             result = result + f"{round(minutes)} Mins "
         result = result + f"{round(seconds)} Secs"
         return result
+    
+    def get_input_stream(self, path):
+        print(self.asset.name)
+        print(self.start_time)
+        print(self.duration)
+        stream =  ffmpeg.input(path, ss=self.start_time, t=self.duration)
+        return stream.audio.filter('atrim', start=self.start_time, duration=self.duration).filter('asetpts', 'PTS-STARTPTS')
 
+
+    def get_input_stream_with_filters(self,path):
+        #stream = self.get_input_stream(path)
+        stream =  ffmpeg.input(path, ss=self.start_time, t=self.duration)
+        audio = stream.audio
+        if self.fade_in_length > 0:
+            audio = audio.filter('afade', t='in', st=self.start_time, d=self.fade_in_length)
+        if self.fade_out_length > 0:
+            audio = audio.filter('afade', t='out', st=self.end_time - self.fade_out_length, d=self.fade_out_length)
+        #filters = (
+        #    stream.audio
+        #    .filter('afade', t='in', st=self.start_time, d=self.fade_in_length)
+        #    .filter('afade', t='out', st=self.end_time - self.fade_out_length, d=self.fade_out_length)
+        #)
+        return audio
+    
 class Show(BaseModel):
     build_date = DateField()
     first_air_date = DateField()
@@ -62,11 +86,8 @@ class Show(BaseModel):
     def clips(self):
         return self._clips 
     @property
-    def clip_duration(self):
-        tot_duration = 0
-        for c in clips:
-            tot_duration = tot_duration + c.duration
-        return tot_duration
+    def is_built(self):
+        return True if self.build_date else False 
     
     def has_unfilled_segment(self):
         if self.get_first_unfilled_segment():
@@ -89,9 +110,8 @@ class Show(BaseModel):
         else:
             return False
         
-    def build(self, directory):
-        # TODO: Should not assume that directory ends with /
-        outputfile = directory + self.filename
+    def build(self, output_dir):
+        outputfile = path.normpath(output_dir) + "/" +self.filename
         streams = []
         for seg in self.segments:
             for sc in seg.clips:

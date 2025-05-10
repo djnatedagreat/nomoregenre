@@ -15,6 +15,7 @@ def handle(cli_args, **kwargs):
     action_parsers.add_parser("preview", help="Preview Asset")
     action_parsers.add_parser("show", help="Show Asset Details")
     action_parsers.add_parser("clip", help="Create Asset Clip")
+    action_parsers.add_parser("trim", help="Trim Asset Clip") # remove from beginning or end but no other changes
     args, remaining_args = parser.parse_known_args(cli_args)
     try:
         module_name = f"commands.asset.{args.action}"

@@ -36,12 +36,9 @@ class BuildShowAction(Action):
                     segment_file = config["LIBRARY_DIR"] + "/" + sc.clip.asset.type.name + "/" + sc.clip.asset.filename
                     # This is the wav output file.
                     fd, wav_file = tempfile.mkstemp(dir=temp_dir, suffix=".wav")
-                    #close_fd(fd)  # Close the file descriptor if you're not using it immediately
-                    #print("Unique file path:", path)
-                    #wav_file = path.join(temp_dir, sc.clip.asset.filename.replace(".mp3",".wav"))
-                    # TODO: why does it keep prompting me if I want to overwrite the file????
+                    close_fd(fd)
                     # This converts the mp3 to a wav
-                    ffmpeg.input(segment_file).output(wav_file).run()
+                    ffmpeg.input(segment_file).output(wav_file).overwrite_output().run()
                     mix_input = sc.clip.get_input_stream_with_filters(wav_file)
                     mix_inputs.append(mix_input)
             

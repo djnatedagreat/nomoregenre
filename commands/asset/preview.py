@@ -13,8 +13,8 @@ config = load_config()
 
 class PreviewAssetAction(Action):
 
-    def __init__(self, args):
-        self.id = super().require_arg(args, "id")
+    def __init__(self, id, args):
+        self.id = id
         self.clip_len = 7 * 1000
         self.cf = 1*1000 # crossfade
 
@@ -57,9 +57,9 @@ class PreviewAssetAction(Action):
 def handle(args, **kwargs):
 
     parser = argparse.ArgumentParser(description="Preview Asset")
-    parser.add_argument('--id', dest="id", help="Asset ID")
+    parser.add_argument('id', help="Asset ID or Ref")
     parsed_args = parser.parse_args(args)
-    action = PreviewAssetAction(parsed_args)
+    action = PreviewAssetAction(parsed_args.id, parsed_args)
     try:
         action.run()
     except Exception as e:

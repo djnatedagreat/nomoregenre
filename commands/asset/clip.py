@@ -9,9 +9,9 @@ config = load_config()
 # Create a clip of the asset
 class ClipAssetAction(Action):
 
-    def __init__(self, asset_type, args):
+    def __init__(self, id, asset_type, args):
         self.asset_type = asset_type
-        self.id = super().require_arg(args, "id")
+        self.id = id
         self.start = args.start
         self.end = args.end
 
@@ -38,11 +38,11 @@ class ClipAssetAction(Action):
 def handle(args, **kwargs):
 
     parser = argparse.ArgumentParser(description="Clip Asset")
+    parser.add_argument('id', help="Asset ID")
     parser.add_argument('start')
     parser.add_argument('end')
-    parser.add_argument('--id', required=True, dest="id", help="Asset ID")
     parsed_args = parser.parse_args(args)
-    action = ClipAssetAction(kwargs.get("at"), parsed_args)
+    action = ClipAssetAction(parsed_args.id, kwargs.get("at"), parsed_args)
     try:
         action.run()
     except Exception as e:

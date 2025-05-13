@@ -11,9 +11,9 @@ config = load_config()
 
 class ShowAssetAction(Action):
 
-    def __init__(self, asset_type, args):
+    def __init__(self, id, asset_type, args):
         self.asset_type = asset_type
-        self.id = super().require_arg(args, "id")
+        self.id = id
 
     def run(self):
        
@@ -47,8 +47,9 @@ class ShowAssetAction(Action):
         asset_file = directory + aa.filename
         preview_file = asset_file + ".preview"
 
-        h1 ("("+aa.type.name.capitalize()+") Details")
+        h1 ("Details")
         print(Fore.CYAN+"ID:\t\t"+Fore.WHITE+Style.BRIGHT + str(aa.id) + Style.RESET_ALL)
+        print(Fore.CYAN+"Type:\t\t" +Fore.WHITE+Style.BRIGHT + aa.type.name.capitalize() + Style.RESET_ALL)
         print(Fore.CYAN+"Name:\t\t" +Fore.WHITE+Style.BRIGHT + aa.name+ Style.RESET_ALL)
         print(Fore.CYAN+"Created By:\t" +Fore.WHITE+Style.BRIGHT + aa.creator.name+ Style.RESET_ALL)
         print(Fore.CYAN+"Submit Date:\t" +Fore.WHITE+Style.BRIGHT + aa.submitted.strftime("%Y-%m-%d")+ Style.RESET_ALL)
@@ -72,9 +73,9 @@ class ShowAssetAction(Action):
 def handle(args, **kwargs):
 
     parser = argparse.ArgumentParser(description="Show Asset Details")
-    parser.add_argument('--id', dest="id", help="Asset ID")
+    parser.add_argument('id', help="Asset ID or Ref")
     parsed_args = parser.parse_args(args)
-    action = ShowAssetAction(kwargs.get("at"), parsed_args)
+    action = ShowAssetAction(parsed_args.id, kwargs.get("at"), parsed_args)
     try:
         action.run()
     except Exception as e:

@@ -14,9 +14,9 @@ config = load_config()
 # If trimmed from the end, it can figure that out automatically because it can detect the change in length.
 class TrimAssetAction(Action):
 
-    def __init__(self, asset_type, args):
+    def __init__(self, id, asset_type, args):
         self.asset_type = asset_type
-        self.id = super().require_arg(args, "id")
+        self.id = id
         self.offset = args.offset
 
     def run(self):
@@ -60,10 +60,10 @@ class TrimAssetAction(Action):
 def handle(args, **kwargs):
 
     parser = argparse.ArgumentParser(description="Resize Clips")
+    parser.add_argument('id', help="Asset ID")
     parser.add_argument('--offset', type=float) # start offset (change from start) in seconds
-    parser.add_argument('--id', required=True, dest="id", help="Asset ID")
     parsed_args = parser.parse_args(args)
-    action = TrimAssetAction(kwargs.get("at"), parsed_args)
+    action = TrimAssetAction(parsed_args.id, kwargs.get("at"), parsed_args)
     try:
         action.run()
     except Exception as e:

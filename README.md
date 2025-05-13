@@ -132,27 +132,27 @@ Replace a with an asset type, eg. mix, etc... and only that asset type will be l
 
 #### Preview Audio Asset
 
-`$ python nmg.py a preview --id="x"`
+`$ python nmg.py a preview asset_id`
 
 Replacing "a" with asset type is allowed, but it doesn't change the behavior
 
-`$ python nmg.py mix preview --id="x"`
+`$ python nmg.py mix preview asset_id`
 
 #### View/Show Audio Asset
 
-`$ python nmg.py a show --id="x"`
+`$ python nmg.py a show asset_id`
 
 Replacing "a" with asset type is allowed, but it doesn't change the behavior
 
-`$ python nmg.py mix show --id="x"`
+`$ python nmg.py mix show asset_id`
 
 ### Manage Audio Clips
 
 #### Add Audio Clip
 
-`$ python nmg.py mix clip --id="x" start end`
+$ python nmg.py mix clip asset_id start end`
 
---id is the id of the Audio Asset being clipped
+start and end are formatted as hh:mm:ss.000
 
 #### List Audio Clip
 

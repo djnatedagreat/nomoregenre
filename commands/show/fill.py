@@ -1,6 +1,6 @@
 import argparse
 import inquirer
-from models import ShowSegment, Show, AudioClip, AudioAsset, Creator
+from models import ShowSegment, Show, AudioClip, AudioAsset, Creator, AssetType
 #from peewee import fn
 from ..action import Action
 from utils import get_seconds, format_seconds, h1
@@ -23,7 +23,13 @@ class FillShowAction(Action):
 
             print("  " + format_seconds(segment_to_fill.get_min_time_to_fill()) + " left to fill")
             print("\n")
-            new_clip = self.choose_clip(segment_to_fill)
+            at_choices = {}
+            ats = AssetType.select()
+            for at in ats:
+                at_choices[at.name] = at.id
+            at_q = [inquirer.List("asset_type", message="What do you want to add?", choices=list(at_choices.keys()))]
+            answers = inquirer.prompt(at_q)
+            new_clip = self.choose_clip(segment_to_fill, at_choices[answers["asset_type"]])
             segment_to_fill.add_clip(new_clip)
 
             if segment_to_fill.is_filled and segment_to_fill.overage > 0:
@@ -33,8 +39,8 @@ class FillShowAction(Action):
         print('Show is filled! Use build command to make mp3 file.')  
 
     
-    def choose_clip(self,segment):
-        clips = AudioClip.select().join(AudioAsset).join(Creator).where(AudioClip.end_time - AudioClip.start_time < segment.get_max_time_to_fill()).order_by(AudioAsset.type, AudioAsset.submitted.desc(), AudioAsset.name, (AudioClip.end_time - AudioClip.start_time).desc())
+    def choose_clip(self,segment,asset_type):
+        clips = AudioClip.select().join(AudioAsset).join(Creator).where(AudioAsset.type_id == asset_type).where(AudioClip.end_time - AudioClip.start_time < segment.get_max_time_to_fill()).order_by(AudioAsset.type, AudioAsset.submitted.desc(), AudioAsset.name, (AudioClip.end_time - AudioClip.start_time).desc())
         choices = []
         for c in clips:
             choices.append((c.asset.creator.name + " - " + c.asset.submitted.strftime("%Y-%m-%d") + " - " + c.asset.name + " (" + c.format_seconds() + ")", c.id))

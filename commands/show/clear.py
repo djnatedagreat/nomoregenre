@@ -10,8 +10,8 @@ from colorama import Fore, Back, Style
 
 class ClearShowAction(Action):
 
-    def __init__(self, args):
-        self.id = super().require_arg(args, "id")
+    def __init__(self, id, args):
+        self.id = id
 
     def run(self):
         show = Show.get_by_id(self.id)
@@ -30,9 +30,9 @@ class ClearShowAction(Action):
 def handle(args, **kwargs):
 
     parser = argparse.ArgumentParser(description="Show Asset Details")
-    parser.add_argument('--id', dest="id", help="Asset ID")
+    parser.add_argument('id', help="Show ID")
     parsed_args = parser.parse_args(args)
-    action = ClearShowAction(parsed_args)
+    action = ClearShowAction(parsed_args.id, parsed_args)
     try:
         action.run()
     except Exception as e:

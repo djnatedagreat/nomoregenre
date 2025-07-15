@@ -56,6 +56,8 @@ An audio clip is a segment of an audio asset as defined in seconds. All clips ha
 
 A program defines the format of a show. It defines the show segments, the length of each segment and if that segment is prefilled with particular clips. For example, the No More Genre radio show is 3 hours long. Each hour of music is preceeded by a station ID. All shows must have a program associated with them. This provides the necessary timing parameters for filling the show with music and mixes. See nomoregenre_program.json as an example.
 
+TODO: document program file structure.
+
 ### Shows
 
 A show represents the full radio show. A Show is a combination of audio assets that are "strung together" to fill the show. For example, you might have an hour long show, and to fill that hour, you might string together a bunch of songs, IDS, bumpers and sweepers to fill that time. 
@@ -170,15 +172,15 @@ start and end are formatted as hh:mm:ss.000
 
 #### View (Show) a Show's Details
 
-`$ python show.py show --id=[show_id]`
+`$ python show.py show show_id`
 
 #### Fill a show with Audio Clips
 
-`$ python show.py fill --id=[show_id]`
+`$ python show.py fill show_id`
 
 #### Build the show .... Compile it into a single mp3 file
 
-`$ python show.py build --id=[show_id]`
+`$ python show.py build show_id`
 
 #### List all Shows
 

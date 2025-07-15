@@ -9,9 +9,8 @@ from colorama import Fore, Back, Style
 
 class ShowShowAction(Action):
 
-    def __init__(self, args):
-        self.id = super().require_arg(args, "id")
-
+    def __init__(self, id, args):
+        self.id = id
 
     def run(self):
         s = Show.get_by_id(self.id)
@@ -49,9 +48,9 @@ class ShowShowAction(Action):
 def handle(args, **kwargs):
 
     parser = argparse.ArgumentParser(description="Show Show")
-    parser.add_argument('--id', dest="id", help="Show ID")
+    parser.add_argument('id', help="Show ID")
     parsed_args = parser.parse_args(args)
-    action = ShowShowAction(parsed_args)
+    action = ShowShowAction(parsed_args.id, parsed_args)
     try:
         action.run()
     except Exception as e:

@@ -9,8 +9,8 @@ from utils import get_seconds, format_seconds, h1
 
 class PluckShowAction(Action):
 
-    def __init__(self, args):
-        self.show_id = super().require_arg(args, "show_id")
+    def __init__(self, id, args):
+        self.show_id = id
         self.asset_id = super().require_arg(args, "asset_id")
 
     def run(self):
@@ -31,10 +31,10 @@ class PluckShowAction(Action):
 def handle(args, **kwargs):
 
     parser = argparse.ArgumentParser(description="Show Asset Details")
-    parser.add_argument('--id', dest="show_id", help="Show ID")
+    parser.add_argument('id', help="Show ID")
     parser.add_argument('--asset', dest="asset_id", help="Asset ID to be plucked")
     parsed_args = parser.parse_args(args)
-    action = PluckShowAction(parsed_args)
+    action = PluckShowAction(parsed_args.id, parsed_args)
     try:
         action.run()
     except Exception as e:

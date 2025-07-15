@@ -11,8 +11,8 @@ import ffmpeg
 
 class BuildShowAction(Action):
     
-    def __init__(self, args):
-        self.id = super().require_arg(args, "id")
+    def __init__(self, id, args):
+        self.id = id
         self.default_crossfade = 5*1000 # crossfade
 
     def run(self):
@@ -77,42 +77,12 @@ class BuildShowAction(Action):
 
 def handle(args, **kwargs):
     parser = argparse.ArgumentParser(description="Build Show")
-    parser.add_argument('--id', dest="id", help="Show ID")
+    parser.add_argument('id', help="Show ID")
     parsed_args = parser.parse_args(args)
-    action = BuildShowAction(parsed_args)
+    action = BuildShowAction(parsed_args.id, parsed_args)
     try:
         action.run()
     except Exception as e:
         print("Error: " + str(e))
         exit(2)
-
-'''
-def build(self, output_dir):
-        #from pydub import AudioSegment
-        outputfile = path.normpath(output_dir) + "/" +self.filename
-        #show = AudioSegment.empty()
-            #for m in markers:
-                #print('appending preview at' +str(m))
-                #st = m*1000
-                #end = st + clip_len
-                #print("len: " + str(end - st))
-                #preview = preview.append(segment[st:end], crossfade=cf)
-            #preview = preview.append(segment[0-clip_len:], crossfade=cf)
-            # save a preview file for speed and efficiency next time
-            #preview.export(preview_file, format="mp3")
-        streams = []
-        for seg in self.segments:
-            for sc in seg.clips:
-                # TODO: Should not know about LIBRARY DIR. Should probably call a util
-                #show = show.append(segment[st:end], crossfade=cf)
-                streams.append(ffmpeg.input(config["LIBRARY_DIR"] + "/" + sc.clip.asset.type.name + "/" + sc.clip.asset.filename, ss=sc.clip.start_time, to=sc.clip.end_time))
-        (
-        ffmpeg
-        .concat(*streams, v=0, a=1)
-        .output(outputfile)
-        .run()
-        ) 
-
-'''
-
         

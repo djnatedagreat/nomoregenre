@@ -30,6 +30,9 @@ class FillShowAction(Action):
             at_q = [inquirer.List("asset_type", message="What do you want to add?", choices=list(at_choices.keys()))]
             answers = inquirer.prompt(at_q)
             new_clip = self.choose_clip(segment_to_fill, at_choices[answers["asset_type"]])
+            if new_clip == None:
+                continue
+            
             segment_to_fill.add_clip(new_clip)
 
             if segment_to_fill.is_filled and segment_to_fill.overage > 0:
@@ -42,6 +45,8 @@ class FillShowAction(Action):
     def choose_clip(self,segment,asset_type):
         clips = AudioClip.select().join(AudioAsset).join(Creator).where(AudioAsset.type_id == asset_type).where(AudioClip.end_time - AudioClip.start_time < segment.get_max_time_to_fill()).order_by(AudioAsset.type, AudioAsset.submitted.desc(), AudioAsset.name, (AudioClip.end_time - AudioClip.start_time).desc())
         choices = []
+        back_option = "← Go Back"
+        choices.append(back_option)
         for c in clips:
             choices.append((c.asset.creator.name + " - " + c.asset.submitted.strftime("%Y-%m-%d") + " - " + c.asset.name + " (" + c.format_seconds() + ")", c.id))
         
@@ -50,6 +55,9 @@ class FillShowAction(Action):
         ]
 
         answers = inquirer.prompt(questions)
+        if answers["clip"] == back_option:
+            return None
+        
         return AudioClip.get(AudioClip.id==answers["clip"])
 
 def handle(args, **kwargs):

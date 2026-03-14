@@ -27,6 +27,7 @@ class AudioAsset(BaseModel):
     type = ForeignKeyField(AssetType, backref='assets')
     creator = ForeignKeyField(Creator, backref='assets')
     submitted = DateField()
+    description = CharField(null=True)
     def get_path_to_file(self):
         return config["LIBRARY_DIR"] + "/" + self.type.name + "/" + self.filename
 
@@ -112,11 +113,13 @@ class Show(BaseModel):
             return False
         
     def build(self, output_dir):
+        #from pydub import AudioSegment
         outputfile = path.normpath(output_dir) + "/" +self.filename
         streams = []
         for seg in self.segments:
             for sc in seg.clips:
                 # TODO: Should not know about LIBRARY DIR. Should probably call a util
+                #show = show.append(segment[st:end], crossfade=cf)
                 streams.append(ffmpeg.input(config["LIBRARY_DIR"] + "/" + sc.clip.asset.type.name + "/" + sc.clip.asset.filename, ss=sc.clip.start_time, to=sc.clip.end_time))
         (
         ffmpeg
@@ -214,8 +217,6 @@ class ShowSegmentClip(BaseModel):
     @property
     def duration(self):
         return self.clip.duration
-
-
 
 '''
 

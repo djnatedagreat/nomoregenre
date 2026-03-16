@@ -1,10 +1,11 @@
 import argparse
 import inquirer
-from models import ShowSegment, Show, AudioClip, AudioAsset, Creator, AssetType
+from models import ShowSegment, Show, ShowSegmentClip, AudioClip, AudioAsset, Creator, AssetType
 #from peewee import fn
 from ..action import Action
 from utils import get_seconds, format_seconds, h1
 from colorama import Fore, Back, Style
+from tabulate import tabulate
 
 #config = load_config()
 
@@ -60,14 +61,62 @@ class FillShowAction(Action):
         
         return AudioClip.get(AudioClip.id==answers["clip"])
 
+def print_candidates(show):
+    segment = show.get_first_unfilled_segment()
+    if not segment:
+        raise Exception("Show has no unfilled segments.")
+
+    max_duration = segment.get_max_time_to_fill()
+    min_duration = segment.get_min_time_to_fill()
+
+    h1(f"Segment: {segment.name}")
+    print(f"  Min to fill: {format_seconds(min_duration)}")
+    print(f"  Max to fill: {format_seconds(max_duration)}\n")
+
+    used_mix_asset_ids = (AudioAsset
+                          .select(AudioAsset.id)
+                          .join(AudioClip)
+                          .join(ShowSegmentClip)
+                          .join(ShowSegment)
+                          .where(ShowSegment.show == show)
+                          .where(AudioAsset.type == AssetType.get(AssetType.name == 'mix').id)
+                          .tuples())
+    used_mix_asset_ids = {row[0] for row in used_mix_asset_ids}
+
+    clips = (AudioClip
+             .select()
+             .join(AudioAsset)
+             .join(Creator)
+             .where((AudioClip.end_time - AudioClip.start_time) <= max_duration)
+             .where((AudioAsset.type != AssetType.get(AssetType.name == 'mix').id) |
+                    (AudioAsset.id.not_in(used_mix_asset_ids)))
+             .order_by(AudioAsset.type, AudioAsset.submitted.desc(), AudioAsset.name,
+                       (AudioClip.end_time - AudioClip.start_time).desc()))
+
+    headers = ['Clip ID', 'Type', 'Creator', 'Asset Name', 'Submitted', 'Duration']
+    data = [[c.id, c.asset.type.name, c.asset.creator.name, c.asset.name, c.asset.submitted, c.format_seconds()] for c in clips]
+
+    if not data:
+        print("No clips found that fit this segment.")
+        return
+
+    print(tabulate(data, headers=headers, tablefmt="pipe"))
+
+
 def handle(args, **kwargs):
 
-    parser = argparse.ArgumentParser(description="Show Asset Details")
+    parser = argparse.ArgumentParser(description="Fill Show Segments")
     parser.add_argument('id', help="Show ID")
+    parser.add_argument('--candidates', action='store_true', help="List clips that fit the next unfilled segment")
     parsed_args = parser.parse_args(args)
-    action = FillShowAction(parsed_args.id, parsed_args)
+
     try:
-        action.run()
+        if parsed_args.candidates:
+            show = Show.get_by_id(parsed_args.id)
+            print_candidates(show)
+        else:
+            action = FillShowAction(parsed_args.id, parsed_args)
+            action.run()
     except Exception as e:
         print("Error: " + str(e))
         exit(2)

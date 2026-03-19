@@ -20,6 +20,9 @@ class Creator(BaseModel):
 class AssetType(BaseModel):
     name = CharField()
 
+class Tag(BaseModel):
+    name = CharField(unique=True)
+
 class AudioAsset(BaseModel):
     key=CharField(unique=True)
     name = CharField()
@@ -30,6 +33,13 @@ class AudioAsset(BaseModel):
     description = CharField(null=True)
     def get_path_to_file(self):
         return config["LIBRARY_DIR"] + "/" + self.type.name + "/" + self.filename
+
+class AudioAssetTag(BaseModel):
+    asset = ForeignKeyField(AudioAsset, backref='asset_tags')
+    tag = ForeignKeyField(Tag, backref='asset_tags')
+
+    class Meta:
+        indexes = ((('asset', 'tag'), True),)
 
 class AudioClip(BaseModel):
     asset = ForeignKeyField(AudioAsset, backref='clips')

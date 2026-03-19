@@ -1,5 +1,5 @@
 import argparse
-from models import AudioAsset, AssetType, Creator, AudioClip, ShowSegmentClip
+from models import AudioAsset, AssetType, Creator, AudioClip, ShowSegmentClip, AudioAssetTag, Tag
 from peewee import fn, JOIN
 from tabulate import tabulate
 
@@ -29,10 +29,11 @@ class ListAssetAction:
                 raise Exception("Invalid creator specified.")
             assets = assets.where(AudioAsset.creator == creator.id)
         
-        headers = ['ID','Key', 'Type', 'Created By', 'Asset Name', 'Submitted', 'Use Count']
+        headers = ['ID', 'Key', 'Type', 'Created By', 'Asset Name', 'Submitted', 'Use Count', 'Tags']
         data = []
         for a in assets:
-            data.append([a.id, a.key, a.type.name, a.creator.name, a.name, a.submitted, a.clip_use_count])
+            tags = ', '.join(at.tag.name for at in AudioAssetTag.select().join(Tag).where(AudioAssetTag.asset == a.id))
+            data.append([a.id, a.key, a.type.name, a.creator.name, a.name, a.submitted, a.clip_use_count, tags])
             #print(f"({a.id}) {a.type.name}\t\t{a.creator.name}\t{a.name}\t\t{a.clip_use_count}")
         
         print(tabulate(data, headers=headers, tablefmt="pipe"))

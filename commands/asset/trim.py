@@ -43,7 +43,7 @@ class TrimAssetAction(Action):
             curr_start = c.start_time
             curr_end = c.end_time
             # should I check if the new duration is different from the old duration??
-            if self.offset > 0: # adjust based on --offset
+            if self.offset and self.offset > 0: # adjust based on --offset
                 c.start_time = max(c.start_time - self.offset,0)
                 # shift the end time
                 c.end_time = max(c.end_time - self.offset,0)

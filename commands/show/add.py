@@ -43,6 +43,7 @@ class AddShowAction(Action):
                             new_segment_clip = ShowSegmentClip(segment=segment, clip=clip)
                             new_segment_clip.save()
                             print()
+                print("New show created with ID " + str(show.id))
             except BaseException as e:
                 # Because this block of code is wrapped with "atomic", a
                 # new transaction will begin automatically after the call

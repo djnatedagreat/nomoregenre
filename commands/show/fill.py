@@ -1,6 +1,7 @@
 import argparse
 import inquirer
-from models import ShowSegment, Show, ShowSegmentClip, AudioClip, AudioAsset, Creator, AssetType
+from models import ShowSegment, Show, ShowSegmentClip, AudioClip, AudioAsset, AudioAssetTag, Tag, Creator, AssetType
+from peewee import fn
 #from peewee import fn
 from ..action import Action
 from utils import get_seconds, format_seconds, h1
@@ -93,8 +94,22 @@ def print_candidates(show):
              .order_by(AudioAsset.type, AudioAsset.submitted.desc(), AudioAsset.name,
                        (AudioClip.end_time - AudioClip.start_time).desc()))
 
-    headers = ['Clip ID', 'Type', 'Creator', 'Asset Name', 'Submitted', 'Duration']
-    data = [[c.id, c.asset.type.name, c.asset.creator.name, c.asset.name, c.asset.submitted, c.format_seconds()] for c in clips]
+    usage_stats = (ShowSegmentClip
+                   .select(ShowSegmentClip.clip,
+                           fn.MAX(Show.first_air_date).alias('last_air_date'),
+                           fn.COUNT(ShowSegmentClip.id).alias('use_count'))
+                   .join(ShowSegment)
+                   .join(Show)
+                   .group_by(ShowSegmentClip.clip)
+                   .tuples())
+    usage_map = {row[0]: (row[1], row[2]) for row in usage_stats}
+
+    headers = ['Clip ID', 'Type', 'Creator', 'Asset Name', 'Submitted', 'Duration', 'Last Used', 'Use Count', 'Tags']
+    data = []
+    for c in clips:
+        tags = ', '.join(at.tag.name for at in AudioAssetTag.select().join(Tag).where(AudioAssetTag.asset == c.asset.id))
+        last_used, use_count = usage_map.get(c.id, ('', ''))
+        data.append([c.id, c.asset.type.name, c.asset.creator.name, c.asset.name, c.asset.submitted, c.format_seconds(), last_used, use_count, tags])
 
     if not data:
         print("No clips found that fit this segment.")

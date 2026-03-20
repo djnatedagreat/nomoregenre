@@ -2,6 +2,7 @@ from dotenv import dotenv_values
 from peewee import * 
 from playhouse.sqlite_ext import SqliteExtDatabase
 from audio_functions import get_duration
+from os import path
 from utils import format_seconds, load_config
 import ffmpeg
 
@@ -19,6 +20,9 @@ class Creator(BaseModel):
 class AssetType(BaseModel):
     name = CharField()
 
+class Tag(BaseModel):
+    name = CharField(unique=True)
+
 class AudioAsset(BaseModel):
     key=CharField(unique=True)
     name = CharField()
@@ -26,8 +30,16 @@ class AudioAsset(BaseModel):
     type = ForeignKeyField(AssetType, backref='assets')
     creator = ForeignKeyField(Creator, backref='assets')
     submitted = DateField()
+    description = CharField(null=True)
     def get_path_to_file(self):
         return config["LIBRARY_DIR"] + "/" + self.type.name + "/" + self.filename
+
+class AudioAssetTag(BaseModel):
+    asset = ForeignKeyField(AudioAsset, backref='asset_tags')
+    tag = ForeignKeyField(Tag, backref='asset_tags')
+
+    class Meta:
+        indexes = ((('asset', 'tag'), True),)
 
 class AudioClip(BaseModel):
     asset = ForeignKeyField(AudioAsset, backref='clips')
@@ -49,8 +61,32 @@ class AudioClip(BaseModel):
             result = result + f"{round(minutes)} Mins "
         result = result + f"{round(seconds)} Secs"
         return result
+    
+    def get_input_stream(self, path):
+        print(self.asset.name)
+        print(self.start_time)
+        print(self.duration)
+        stream =  ffmpeg.input(path, ss=self.start_time, t=self.duration)
+        return stream.audio.filter('atrim', start=self.start_time, duration=self.duration).filter('asetpts', 'PTS-STARTPTS')
 
+
+    def get_input_stream_with_filters(self,path):
+        #stream = self.get_input_stream(path)
+        stream =  ffmpeg.input(path, ss=self.start_time, t=self.duration)
+        audio = stream.audio
+        if self.fade_in_length > 0:
+            audio = audio.filter('afade', t='in', st=self.start_time, d=self.fade_in_length)
+        if self.fade_out_length > 0:
+            audio = audio.filter('afade', t='out', st=self.end_time - self.fade_out_length, d=self.fade_out_length)
+        #filters = (
+        #    stream.audio
+        #    .filter('afade', t='in', st=self.start_time, d=self.fade_in_length)
+        #    .filter('afade', t='out', st=self.end_time - self.fade_out_length, d=self.fade_out_length)
+        #)
+        return audio
+    
 class Show(BaseModel):
+    name = CharField()
     build_date = DateField()
     first_air_date = DateField()
     duration = IntegerField()
@@ -62,11 +98,8 @@ class Show(BaseModel):
     def clips(self):
         return self._clips 
     @property
-    def clip_duration(self):
-        tot_duration = 0
-        for c in clips:
-            tot_duration = tot_duration + c.duration
-        return tot_duration
+    def is_built(self):
+        return True if self.build_date else False 
     
     def has_unfilled_segment(self):
         if self.get_first_unfilled_segment():
@@ -89,13 +122,14 @@ class Show(BaseModel):
         else:
             return False
         
-    def build(self, directory):
-        # TODO: Should not assume that directory ends with /
-        outputfile = directory + self.filename
+    def build(self, output_dir):
+        #from pydub import AudioSegment
+        outputfile = path.normpath(output_dir) + "/" +self.filename
         streams = []
         for seg in self.segments:
             for sc in seg.clips:
                 # TODO: Should not know about LIBRARY DIR. Should probably call a util
+                #show = show.append(segment[st:end], crossfade=cf)
                 streams.append(ffmpeg.input(config["LIBRARY_DIR"] + "/" + sc.clip.asset.type.name + "/" + sc.clip.asset.filename, ss=sc.clip.start_time, to=sc.clip.end_time))
         (
         ffmpeg
@@ -134,6 +168,8 @@ class ShowSegment(BaseModel):
     name = CharField()
     duration_min = IntegerField(default=0)
     duration_max = IntegerField(default=0)
+    # prefill only segments can only be filled during program creation
+    prefill_only = BooleanField(default=False)  
     #segment = ForeignKeyField(AudioClip) # this will be moving to ShowSegmentClips
     @property
     def filled_time(self):
@@ -191,8 +227,6 @@ class ShowSegmentClip(BaseModel):
     @property
     def duration(self):
         return self.clip.duration
-
-
 
 '''
 

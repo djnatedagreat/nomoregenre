@@ -48,26 +48,9 @@ match args.command:
         for clip in clips:
             print ("(" + str(clip.id) + ")\t"+clip.asset.name + "\t" + format_seconds(clip.duration))
     case "add":
-        asset_name = require_name()
-        creator = require_creator()
-        matches = (AudioAsset.select().where(AudioAsset.name.contains(asset_name), AudioAsset.creator_id == creator.id).dicts())
 
-        mix_options = []
-        for m in matches:
-            mix_options.append((m['name'], m['id']))
-
-        questions2 = [
-            inquirer.List("mix", message="What mix?", choices=mix_options),
-            inquirer.Text("start", message="Start time (hh::mm::ss)"),
-            inquirer.Text("end", message="End time (hh::mm::ss)"),
-        ]
-
-        answers2 = inquirer.prompt(questions2)
-
-        clip = AudioClip(asset=answers2["mix"],start_time=get_seconds(answers2["start"]),end_time=get_seconds(answers2["end"]))
-        clip.save()
+        print("use nmg.py a clip --id=x start end")
         
-        print(f"Clip saved")
     case "replace":
         asset_name = require_name()
         creator = require_creator()

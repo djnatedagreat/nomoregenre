@@ -118,11 +118,11 @@ Next...
 
 #### Add Audio Asset
 
-`$ python a add --file path_to_audio_file.mp3 --name="Unique Asset name" --by="creator_name" --when=2025-04-11`
+`$ python nmg.py a add --file path_to_audio_file.mp3 --name="Unique Asset name" --by="creator_name" --when=2025-04-11`
 
 Note that the argument "a" can be substituted for any asset type, eg. mix, id, song, etc... and the asset type will be set appropriately
 
-`$ python song add --file path_to_audio_file.mp3 --name="Unique Asset name" --by="creator_name" --when=2025-04-11`
+`$ python nmg.py mix add --file path_to_audio_file.mp3 --name="Unique Asset name" --by="creator_name" --when=2025-04-11`
 
 #### List Audio Assets
 
@@ -148,6 +148,18 @@ Replacing "a" with asset type is allowed, but it doesn't change the behavior
 
 `$ python nmg.py mix show asset_id`
 
+#### Tag an Audio Asset
+
+`$ python nmg.py a tag asset_id tag_name`
+
+Tags are freeform strings and will be created automatically if they don't exist. Use any asset type alias in place of "a".
+
+`$ python nmg.py mix tag asset_id early`
+
+To remove a tag:
+
+`$ python nmg.py mix tag asset_id tag_name --remove`
+
 ### Manage Audio Clips
 
 #### Add Audio Clip
@@ -168,31 +180,48 @@ start and end are formatted as hh:mm:ss.000
 
 #### Add a New Show
 
-`$ python show.py add`
+`$ python nmg.py show add air_date --program program_file.json`
 
-#### View (Show) a Show's Details
+#### List All Shows
 
-`$ python show.py show show_id`
+`$ python nmg.py show list`
 
-#### Fill a show with Audio Clips
+#### View a Show's Details
 
-`$ python show.py fill show_id`
+`$ python nmg.py show show show_id`
 
-#### Build the show .... Compile it into a single mp3 file
+#### Fill a Show Interactively
 
-`$ python show.py build show_id`
+`$ python nmg.py show fill show_id`
 
-#### List all Shows
+#### List Candidates for the Next Unfilled Segment
 
-`$ python show.py list`
+`$ python nmg.py show fill show_id --candidates`
 
-```sh
-$ python show.py [show date]
-```
+Prints a table of available clips for the next unfilled segment, including type, creator, duration, submission date, last air date, use count, and tags. Useful for non-interactively reviewing options before pushing clips.
+
+#### Push a Clip to a Show
+
+`$ python nmg.py show push show_id clip_id`
+
+Appends a clip to the next unfilled segment. Raises an error if the clip is too long to fit within the segment's remaining max duration.
+
+#### Pop the Last Clip from a Show
+
+`$ python nmg.py show pop show_id`
+
+Removes the most recently added clip from a show. Useful for undoing a push.
+
+#### Build a Show (Compile to MP3)
+
+`$ python nmg.py show build show_id`
+
+#### Clear All Clips from a Show
+
+`$ python nmg.py show clear show_id`
 
 ## Road Map / TO DO
 
-* Add Description fields to Audio Assets
 * options for fading between clips.
 * smarter ways of choosing clips
 

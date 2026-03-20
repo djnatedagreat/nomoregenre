@@ -4,7 +4,7 @@ CLI for managing audio assets and compiling these assets into full radio shows w
 
 ## Software Status / Version
 
-Currently a proof of concept. It works well enough to get done what I need done, but could be improved, tested, possibly refactored.
+Alpha Status. Works great for my personal needs. Could use some work on streamlining the installation process.
 
 ## Table of Contents
 

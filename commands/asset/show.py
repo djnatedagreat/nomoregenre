@@ -3,11 +3,10 @@ from models import AudioAsset, Creator, AssetType, AudioClip, ShowSegment, Show,
 from peewee import fn
 from ..action import Action
 from os import path
-from utils import get_seconds, load_config, h1, h2
+from utils import get_seconds, h1, h2
 from colorama import Fore, Back, Style
 from tabulate import tabulate
-
-config = load_config()
+from library import library
 
 class ShowAssetAction(Action):
 
@@ -43,8 +42,7 @@ class ShowAssetAction(Action):
         if not aa:
             raise Exception("Audio Asset not found.")
         
-        directory = config["LIBRARY_DIR"]+"/"+aa.type.name+"/"
-        asset_file = directory + aa.filename
+        asset_file = library.asset_path(aa)
         preview_file = asset_file + ".preview"
 
         h1 ("Details")

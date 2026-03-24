@@ -2,11 +2,9 @@ import argparse
 from models import AudioAsset, AudioClip, AssetType
 from peewee import fn
 from ..action import Action
-from utils import get_seconds, load_config
-from os import path
+from utils import get_seconds
+from library import library
 import ffmpeg
-
-config = load_config()
 
 # If an audio file was manually trimmed with, for example, audacity. That will change the length of the file
 # and affect time marks for any clips. This is a utility that will rebuild the clips.
@@ -31,8 +29,7 @@ class TrimAssetAction(Action):
         if not aa:
             raise Exception("Audio Asset not found.")
         
-        directory = path.normpath(config["LIBRARY_DIR"])+"/"+aa.type.name+"/"
-        asset_file = directory + aa.filename
+        asset_file = library.asset_path(aa)
         probe = ffmpeg.probe(asset_file)
         new_duration = float(probe['format']['duration'])  # Extract duration in seconds
         if not new_duration > 0:

@@ -2,6 +2,7 @@ import argparse
 from models import Show
 from ..action import Action
 from utils import load_config
+from library import library
 from slugify import slugify
 from datetime import date
 from os import path, close as close_fd
@@ -33,7 +34,7 @@ class BuildShowAction(Action):
                     # because ffmpeg can't seek through mp3 files like it can through wav files
                     # We will pay with longer wait times during build, but
                     # storing files as mp3s will save a ton of space.
-                    segment_file = config["LIBRARY_DIR"] + "/" + sc.clip.asset.type.name + "/" + sc.clip.asset.filename
+                    segment_file = library.asset_path(sc.clip.asset)
                     # This is the wav output file.
                     fd, wav_file = tempfile.mkstemp(dir=temp_dir, suffix=".wav")
                     close_fd(fd)

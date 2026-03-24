@@ -7,9 +7,8 @@ import ffmpeg
 from pydub import AudioSegment
 from pydub.playback import play
 import numpy as np
-from utils import get_seconds, load_config
-
-config = load_config()
+from utils import get_seconds
+from library import library
 
 class PreviewAssetAction(Action):
 
@@ -26,8 +25,7 @@ class PreviewAssetAction(Action):
             raise Exception("Audio Asset not found.")
         
         
-        directory = config["LIBRARY_DIR"]+"/"+aa.type.name+"/"
-        asset_file = directory + aa.filename
+        asset_file = library.asset_path(aa)
         preview_file = asset_file + ".preview"
         
         # if a preview file exists use it

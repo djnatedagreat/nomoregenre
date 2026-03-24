@@ -4,6 +4,7 @@ from playhouse.sqlite_ext import SqliteExtDatabase
 from audio_functions import get_duration
 from os import path
 from utils import format_seconds, load_config
+from library import library
 import ffmpeg
 
 config = load_config()  # take environment variables from .env.
@@ -32,7 +33,7 @@ class AudioAsset(BaseModel):
     submitted = DateField()
     description = CharField(null=True)
     def get_path_to_file(self):
-        return config["LIBRARY_DIR"] + "/" + self.type.name + "/" + self.filename
+        return library.asset_path(self)
 
 class AudioAssetTag(BaseModel):
     asset = ForeignKeyField(AudioAsset, backref='asset_tags')
@@ -128,9 +129,8 @@ class Show(BaseModel):
         streams = []
         for seg in self.segments:
             for sc in seg.clips:
-                # TODO: Should not know about LIBRARY DIR. Should probably call a util
                 #show = show.append(segment[st:end], crossfade=cf)
-                streams.append(ffmpeg.input(config["LIBRARY_DIR"] + "/" + sc.clip.asset.type.name + "/" + sc.clip.asset.filename, ss=sc.clip.start_time, to=sc.clip.end_time))
+                streams.append(ffmpeg.input(library.asset_path(sc.clip.asset), ss=sc.clip.start_time, to=sc.clip.end_time))
         (
         ffmpeg
         .concat(*streams, v=0, a=1)

@@ -18,6 +18,7 @@ def handle(cli_args, **kwargs):
     action_parsers.add_parser("pluck", help="Remove one clip from Show")
     action_parsers.add_parser("push", help="Push a clip to the next unfilled segment")
     action_parsers.add_parser("pop", help="Remove the last clip from a show")
+    action_parsers.add_parser("backup", help="Backup show files to S3")
     args, remaining_args = parser.parse_known_args(cli_args)
     try:
         module_name = f"commands.show.{args.action}"

@@ -8,6 +8,7 @@ def main():
     creator_type_parser = entity_parsers.add_parser("creator", aliases=['c', 'dj'], help="Manage Creators")
     asset_parser = entity_parsers.add_parser("asset_type", aliases=['at'], help="Manage Asset Types")
     show_parser = entity_parsers.add_parser("show", aliases=['s'], help="Manage Shows")
+    entity_parsers.add_parser("admin", help="Admin commands")
     
     # map used to dynamically route aliases and commands
     command_map = {
@@ -19,7 +20,8 @@ def main():
         "c": "creator",
         "dj": "creator",
         "show": "show",
-        "s": "show"
+        "s": "show",
+        "admin": "admin",
     }
     at_kwarg_map = {
         "asset": {"at":None},
@@ -31,6 +33,7 @@ def main():
         "dj": {"at":None},
         "show": {"at":None},
         "s": {"at":None},
+        "admin": {"at":None},
     }
     # dynamic asset commands based on asset_types
     at_aliases = ['a']

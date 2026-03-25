@@ -18,9 +18,11 @@ def handle(cli_args, **kwargs):
     action_parsers.add_parser("trim", help="Trim Asset Clip") # remove from beginning or end but no other changes
     action_parsers.add_parser("fade", help="Fade Asset Clip")
     action_parsers.add_parser("tag", help="Tag an Asset")
+    action_parsers.add_parser("backup", help="Backup assets to S3")
     args, remaining_args = parser.parse_known_args(cli_args)
     try:
-        module_name = f"commands.asset.{args.action}"
+        module_action = action_module_map.get(args.action, args.action)
+        module_name = f"commands.asset.{module_action}"
         module = importlib.import_module(module_name)
         module.handle(remaining_args, **kwargs)
     except ModuleNotFoundError:

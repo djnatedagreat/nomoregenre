@@ -228,6 +228,14 @@ class ShowSegmentClip(BaseModel):
     def duration(self):
         return self.clip.duration
 
+class ShowPublication(BaseModel):
+    show = ForeignKeyField(Show, backref="publications")
+    provider = CharField()
+    account = CharField(null=True)
+    external_id = CharField()
+    url = CharField()
+    published_at = DateTimeField()
+
 '''
 
 class ShowFormat(Model):

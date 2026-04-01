@@ -220,6 +220,36 @@ Removes the most recently added clip from a show. Useful for undoing a push.
 
 `$ python nmg.py show clear show_id`
 
+#### Publish a Show to SoundCloud
+
+Uploads the built show MP3 to SoundCloud as a private track by default.
+
+`$ python nmg.py show publish show_id --account main`
+
+To upload as public immediately:
+
+`$ python nmg.py show publish show_id --account main --public`
+
+To override the auto-generated title:
+
+`$ python nmg.py show publish show_id --account main --title "My Custom Title"`
+
+The title and description are auto-generated from `PUBLISH_TITLE_TEMPLATE` and `PUBLISH_DESCRIPTION_TEMPLATE` in `.env` if set. On first use, a browser window will open to authorize with SoundCloud. The token is cached locally so subsequent publishes require no login.
+
+#### Make a Published Show Public
+
+If a show has already been published, running the publish command with `--public` will flip the existing SoundCloud track to public without re-uploading.
+
+`$ python nmg.py show publish show_id --account main --public`
+
+#### List Publications for a Show
+
+`$ python nmg.py show pub-list show_id`
+
+Omit `show_id` to list all publications across all shows.
+
+`$ python nmg.py show pub-list`
+
 ## Road Map / TO DO
 
 * options for fading between clips.

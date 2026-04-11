@@ -21,6 +21,11 @@ def handle(cli_args, **kwargs):
     action_parsers.add_parser("import", help="Import assets from watch folder")
     action_parsers.add_parser("backup", help="Backup assets to S3")
     args, remaining_args = parser.parse_known_args(cli_args)
+
+    if not args.action:
+        parser.print_help()
+        return
+
     action_module_map = {"import": "imp"}
     try:
         module_action = action_module_map.get(args.action, args.action)

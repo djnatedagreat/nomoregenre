@@ -22,6 +22,11 @@ def handle(cli_args, **kwargs):
     action_parsers.add_parser("publish", help="Publish a built show to SoundCloud")
     action_parsers.add_parser("pub-list", help="List publications for a show")
     args, remaining_args = parser.parse_known_args(cli_args)
+
+    if not args.action:
+        parser.print_help()
+        return
+
     action_module_map = {"pub-list": "pub_list"}
     try:
         module_action = action_module_map.get(args.action, args.action)

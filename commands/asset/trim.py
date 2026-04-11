@@ -49,6 +49,10 @@ class TrimAssetAction(Action):
                 # if the end time is now greater than the new start time + new duration
                 c.end_time = min(c.start_time + new_duration, c.end_time)
             # I think I might be missing an else that should handle if the end was trimmed????
+            else:
+                # File was trimmed from the end — clamp end_time to new duration
+                if c.end_time > new_duration:
+                    c.end_time = new_duration
             c.save()
             
         print("Clips have been adjusted for " + aa.name)

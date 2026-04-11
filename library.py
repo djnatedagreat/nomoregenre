@@ -37,9 +37,10 @@ class Library:
         Format: YYYY_MM_DD_Creator_Title.mp3
         Example: 2026_03_21_Nate_Outer_Limits_Vol_5.mp3
         """
+        import re
         date_part = submit_date.replace("-", "_")
-        creator_part = creator_name.replace(" ", "_")
-        title_part = "_".join(w.capitalize() for w in asset_name.split())
+        creator_part = re.sub(r"[^\w\s-]", "", creator_name).replace(" ", "_")
+        title_part = "_".join(w.capitalize() for w in re.sub(r"[^\w\s-]", "", asset_name).split())
         return f"{date_part}_{creator_part}_{title_part}.mp3"
 
 library = Library()

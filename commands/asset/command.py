@@ -18,8 +18,10 @@ def handle(cli_args, **kwargs):
     action_parsers.add_parser("trim", help="Trim Asset Clip") # remove from beginning or end but no other changes
     action_parsers.add_parser("fade", help="Fade Asset Clip")
     action_parsers.add_parser("tag", help="Tag an Asset")
+    action_parsers.add_parser("import", help="Import assets from watch folder")
     action_parsers.add_parser("backup", help="Backup assets to S3")
     args, remaining_args = parser.parse_known_args(cli_args)
+    action_module_map = {"import": "imp"}
     try:
         module_action = action_module_map.get(args.action, args.action)
         module_name = f"commands.asset.{module_action}"
